@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EMI Calculator</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+       
+    </head>
+    <body>
+        
+        <div class='container'>
+            <h2>EMI calculator</h2>
+            <div class="form-group">
+                <label><abbr title="Your desired amount">Enter Loan</abbr></label>
+                <input type="text" class="form-control" id="loan"/><span id="msg" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Year</label>
+                <input type="text" class="form-control" id="year"/>
+            </div>
+            <div class="form-group">
+                <label>Interest</label>
+                <input type="text" class="form-control" id="interest"/>
+            </div>
+            <div>
+                <input type="submit" class="btn btn-primary" onclick="calculateEmi()" value="Calculate EMI"/>
+                <!--<input type="text" id="emi" />-->
+                <input type="reset" class="btn btn-reset btn float-right" value="Reset"/>
+            </div><br/>
+            <div class="col-xs-1 text-center" >
+                <h4 class="text-success" id="emi"></h4>
+                <span class="text-info" id="principle" ></span><br/>
+                <span class="text-info" id="total_interest"></span><br/>
+                <span class="text-info" id="total"></span><br/>
+            </div>
+        </div>
+        <!--Javascript logic for response and creating piechart-->
+        <div id="piechart" class="container col-xs-1 center "></div>            
+            <script type="text/javascript">
+                // Load google charts
+                google.charts.load('current', {'packages':['corechart']});
+                google.charts.setOnLoadCallback(drawChart);
+                // Draw the chart and set the chart values
+                function calculateEmi() { 
+                    var loan=Number(document.getElementById("loan").value);
+                    var year=Number(document.getElementById("year").value);
+                    var interest=Number(document.getElementById("interest").value)/100;                        var total_month=year*12;
+                    var result=loan/((1-(1/(Math.pow((1+interest/12),year*12))))/(interest/12));
+                    
+                    //Display result 
+                    document.getElementById("emi").innerHTML="Monthly EMI: "+Math.ceil(result);    
+                    document.getElementById("principle").innerHTML="Principle: "+loan;
+                    document.getElementById("total_interest").innerHTML="Total Interest: "+Math.ceil((result*total_month)-loan);
+                    document.getElementById("total").innerHTML="Total Payment: "+Math.ceil(result*total_month);                        //Drawing a chart
+                    var data = google.visualization.arrayToDataTable([
+                        ['Title', 'amount'],
+                        ['Interest', Math.ceil((result*total_month)-loan) ],
+                        ['Principle', loan],
+                    ]);
+                    // Optional; add a title and set the width and height of the chart
+                    var options = {'title':'Your Payment', 'width':550, 'height':400};
+
+                   // Display the chart inside the <div> element with id="piechart"
+                    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                    chart.draw(data, options);
+               }
+            </script>
+        </div>
+    </body>
+</html>
